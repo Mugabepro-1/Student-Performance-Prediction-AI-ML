@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Performance Predictor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            background: #667eea;
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Animated background elements */
+        .bg-orbs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.15), rgba(255,255,255,0));
+            filter: blur(40px);
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .orb:nth-child(1) {
+            width: 400px;
+            height: 400px;
+            top: -200px;
+            left: -200px;
+            animation-delay: 0s;
+        }
+
+        .orb:nth-child(2) {
+            width: 300px;
+            height: 300px;
+            bottom: -150px;
+            right: -150px;
+            animation-delay: 7s;
+        }
+
+        .orb:nth-child(3) {
+            width: 250px;
+            height: 250px;
+            top: 50%;
+            left: 50%;
+            animation-delay: 3s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(30px) saturate(180%);
+            border-radius: 24px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 
+                0 12px 48px rgba(0, 0, 0, 0.25),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .lead {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 32px;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 10px;
+            letter-spacing: 0.3px;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 14px;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.22);
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1);
+        }
+
+        input[type="number"]::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .row-split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .hint {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-wrapper:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            accent-color: #a78bfa;
+        }
+
+        .checkbox-wrapper label {
+            margin: 0;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 18px 24px;
+            background: linear-gradient(135deg, #a78bfa 0%, #8761fa 100%);
+            border: none;
+            border-radius: 16px;
+            color: #ffffff;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 10px 30px rgba(167, 139, 250, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 15px 40px rgba(167, 139, 250, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .field-error {
+            color: #fca5a5;
+            font-size: 13px;
+            margin-top: 6px;
+            font-weight: 600;
+        }
+
+        .error {
+            background: linear-gradient(135deg, #a78bfa 0%, #875fff 100%);
+            padding: 16px 20px;
+            border-radius: 14px;
+            color: white;
+            margin-top: 16px;
+            font-weight: 600;
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+        }
+
+        .result-box {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 24px;
+            border-radius: 18px;
+            margin-top: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .score-display {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(167, 139, 250, 0.2) 0%, rgba(236, 72, 153, 0.2) 100%);
+            border-radius: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .score-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .score {
+            font-size: 64px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+            line-height: 1;
+        }
+
+        .score-subtitle {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 12px;
+            font-weight: 500;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(180deg, #a78bfa, #a78bfa);
+            border-radius: 2px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        ul li {
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.6;
+            border-left: 3px solid #a78bfa;
+            transition: all 0.3s ease;
+        }
+
+        ul li:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateX(5px);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        .side-hint {
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 14px;
+            margin-bottom: 24px;
+            font-weight: 500;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 968px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .score {
+                font-size: 52px;
+            }
+
+            .card {
+                padding: 30px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .row-split {
+                grid-template-columns: 1fr;
+            }
+
+            body {
+                padding: 20px 16px;
+            }
+
+            .card {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-orbs">
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h1>🎓 Student Performance Predictor</h1>
+            <p class="lead">Enter student details below to receive an AI-powered performance prediction with personalized recommendations.</p>
+
+            <form id="predictionForm" novalidate>
+                <div class="form-group">
+                    <label for="hours_studied">📚 Hours Studied (per day)</label>
+                    <input type="number" id="hours_studied" name="hours_studied" step="0.1" min="0" max="24" placeholder="e.g., 5.5" required>
+                    <div class="field-error" id="err_hours"></div>
+                    <div class="hint">Typical range: 0–24 hours. Quality over quantity!</div>
+                </div>
+
+                <div class="row-split">
+                    <div class="form-group">
+                        <label for="previous_scores">📊 Previous Scores (%)</label>
+                        <input type="number" id="previous_scores" name="previous_scores" step="0.1" min="0" max="100" placeholder="e.g., 85" required>
+                        <div class="field-error" id="err_prev"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="sleep_hours">😴 Sleep Hours (per day)</label>
+                        <input type="number" id="sleep_hours" name="sleep_hours" step="0.1" min="0" max="24" placeholder="e.g., 8" required>
+                        <div class="field-error" id="err_sleep"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="sample_papers">📝 Sample Papers Practiced</label>
+                    <input type="number" id="sample_papers" name="sample_papers" step="1" min="0" placeholder="e.g., 15" required>
+                    <div class="field-error" id="err_papers"></div>
+                    <div class="hint">Number of completed practice exams or mock tests.</div>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="extracurricular" name="extracurricular">
+                        <label for="extracurricular">⚽ Participates in Extracurricular Activities</label>
+                    </div>
+                </div>
+
+                <button class="btn" id="submitBtn" type="submit">Predict Performance</button>
+
+                <div id="formError" style="display:none" class="error"></div>
+            </form>
+        </div>
+
+        <div class="card">
+            <h1>✨ Prediction Results</h1>
+            <p class="side-hint">Your personalized performance index and actionable recommendations will appear here.</p>
+
+            <div id="loading" class="loading" style="display:none">Analyzing your data</div>
+
+            <div id="result" style="display:none">
+                <div class="result-box">
+                    <div class="score-display">
+                        <div class="score-label">Performance Index</div>
+                        <div class="score" id="scoreDisplay">--</div>
+                        <div class="score-subtitle">Higher scores indicate better performance</div>
+                    </div>
+                </div>
+
+                <div class="result-box">
+                    <div class="section-title">💡 Recommendations</div>
+                    <ul id="recommendationsList"></ul>
+                </div>
+
+                <div class="result-box">
+                    <div class="section-title">🎯 Pro Tips</div>
+                    <ul id="tipsList"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_ENDPOINT = 'http://localhost:8000/api/predict/';
+        const form = document.getElementById('predictionForm');
+        const loadingEl = document.getElementById('loading');
+        const resultEl = document.getElementById('result');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const recommendationsList = document.getElementById('recommendationsList');
+        const tipsList = document.getElementById('tipsList');
+        const submitBtn = document.getElementById('submitBtn');
+        const formError = document.getElementById('formError');
+
+        const inputs = {
+            hours: document.getElementById('hours_studied'),
+            prev: document.getElementById('previous_scores'),
+            sleep: document.getElementById('sleep_hours'),
+            papers: document.getElementById('sample_papers'),
+            extracurricular: document.getElementById('extracurricular')
+        };
+
+        const errs = {
+            hours: document.getElementById('err_hours'),
+            prev: document.getElementById('err_prev'),
+            sleep: document.getElementById('err_sleep'),
+            papers: document.getElementById('err_papers')
+        };
+
+        function validateField(name){
+            const v = inputs[name === 'prev' ? 'prev' : name].value;
+            let msg = '';
+            if (v === '' || v === null || v === undefined) {
+                msg = 'This field is required.';
+            } else {
+                const num = Number(v);
+                if (isNaN(num)) msg = 'Must be a number.';
+                else {
+                    if (name === 'hours' || name === 'sleep'){
+                        if (num < 0 || num > 24) msg = 'Enter a value between 0 and 24.';
+                    }
+                    if (name === 'prev'){
+                        if (num < 0 || num > 100) msg = 'Enter a percentage between 0 and 100.';
+                    }
+                    if (name === 'papers'){
+                        if (!Number.isInteger(num) || num < 0) msg = 'Enter a non-negative integer.';
+                    }
+                }
+            }
+            errs[name].textContent = msg;
+            return msg === '';
+        }
+
+        ['hours','prev','sleep','papers'].forEach(k => {
+            inputs[k].addEventListener('blur', () => validateField(k));
+        });
+
+        function clearResult(){
+            resultEl.style.display = 'none';
+            recommendationsList.innerHTML = '';
+            tipsList.innerHTML = '';
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            formError.style.display = 'none';
+            clearResult();
+
+            const okHours = validateField('hours');
+            const okPrev = validateField('prev');
+            const okSleep = validateField('sleep');
+            const okPapers = validateField('papers');
+            if (!okHours || !okPrev || !okSleep || !okPapers){
+                formError.style.display = 'block';
+                formError.textContent = 'Please fix validation errors above.';
+                return;
+            }
+
+            const payload = {
+                hours_studied: Number(inputs.hours.value),
+                previous_scores: Number(inputs.prev.value),
+                extracurricular: inputs.extracurricular.checked,
+                sleep_hours: Number(inputs.sleep.value),
+                sample_papers: Number(inputs.papers.value)
+            };
+
+            submitBtn.disabled = true;
+            loadingEl.style.display = 'block';
+
+            try{
+                const res = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                if (!res.ok){
+                    if (data && data.errors){
+                        formError.style.display = 'block';
+                        formError.textContent = JSON.stringify(data.errors);
+                    } else if (data && data.detail){
+                        formError.style.display = 'block';
+                        formError.textContent = data.detail;
+                    } else {
+                        formError.style.display = 'block';
+                        formError.textContent = 'Server error: ' + (res.status || 'unknown');
+                    }
+                    return;
+                }
+
+                scoreDisplay.textContent = data.predicted_performance_index;
+                if (Array.isArray(data.recommendations)){
+                    data.recommendations.forEach(r => {
+                        const li = document.createElement('li'); 
+                        li.textContent = r; 
+                        recommendationsList.appendChild(li);
+                    });
+                }
+                if (Array.isArray(data.tips)){
+                    data.tips.forEach(t => {
+                        const li = document.createElement('li'); 
+                        li.textContent = t; 
+                        tipsList.appendChild(li);
+                    });
+                }
+                resultEl.style.display = 'block';
+
+            } catch (err){
+                formError.style.display = 'block';
+                formError.textContent = err.message || 'Network error';
+            } finally{
+                loadingEl.style.display = 'none';
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

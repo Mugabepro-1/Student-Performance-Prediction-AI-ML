@@ -1,0 +1,7 @@
+django
+djangorestframework
+pandas 
+scikit-learn 
+joblib
+psycopg2-binary
+django-cors-headers
