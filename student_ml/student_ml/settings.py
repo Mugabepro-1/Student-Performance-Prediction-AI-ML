@@ -86,8 +86,8 @@ DATABASES = {
     'postgres': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'student_performance_db',
-        'USER': 'postgres',
-        'PASSWORD': 'mupro',
+        'USER': '....',
+        'PASSWORD': '....',
         'HOST': 'localhost',
         'PORT': '5432'
     }
